@@ -6,3 +6,5 @@ sources.txt
 shared-data/*.lock
 shared-data/*.tmp
 shared-data/*.properties
+out/
+*.iml
