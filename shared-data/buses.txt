@@ -1,0 +1,3 @@
+1|NA-1234|45|Available|60.0|Normal
+1001|ND-3456|40|Available|65.0|AC
+1002|NB-8365|50|Available|55.0|Normal
