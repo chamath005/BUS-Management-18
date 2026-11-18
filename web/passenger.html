@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BusManager · Passenger Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="application" class="app">
+    <aside class="sidebar">
+        <div class="brand">
+            <span class="logo mini">BM</span>
+            <span>BusManager</span>
+        </div>
+
+        <div class="profile">
+            <div class="avatar" id="avatar">P</div>
+            <div>
+                <b id="profileName">Passenger</b>
+                <small id="profileRole">Passenger</small>
+            </div>
+        </div>
+
+        <nav id="nav"></nav>
+
+        <button class="logout" onclick="logout()">
+            ↪ &nbsp; Log out
+        </button>
+    </aside>
+
+    <main class="main">
+        <header class="header">
+            <div>
+                <div class="overline">BUS MANAGEMENT SYSTEM · PASSENGER</div>
+                <h2 id="heading">Dashboard</h2>
+            </div>
+
+            <div class="signed">
+                <i></i>
+                <span id="signedName">Passenger</span>
+            </div>
+        </header>
+
+        <section id="view" class="view"></section>
+    </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="passenger.js"></script>
+</body>
+</html>
+>
