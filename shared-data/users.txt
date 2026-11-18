@@ -1,0 +1,4 @@
+1|Chamath|test@gmail.com|1234|owner|0770000001|
+2|Kamal|kamal@gmail.com|12345|driver|0771234567|B123456
+845|Gimhan|gimhan@example.com|demo123|conductor|0771234567|CON001
+201|Nimal|passenger@gmail.com|1234|passenger|0779876543|
