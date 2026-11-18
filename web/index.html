@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bus Management System · Sign In</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="auth" class="auth-wrap">
+  <div class="auth-card">
+    <div class="logo">BM</div>
+    <p class="overline">SMART TRANSPORT MANAGEMENT</p>
+    <h1>Welcome to BusManager</h1>
+    <p class="sub" id="authSub">Sign in or create a new user account.</p>
+
+    <div class="tabs">
+      <button id="tabLogin" class="tab active" type="button" onclick="switchAuth('login')">Sign In</button>
+      <button id="tabRegister" class="tab" type="button" onclick="switchAuth('register')">Add New User</button>
+    </div>
+
+    <form id="loginForm">
+      <label>Email address or username</label>
+      <input id="loginEmail" name="email" placeholder="you@example.com" required autocomplete="username">
+      <label>Password</label>
+      <input id="loginPassword" name="password" type="password" placeholder="Your password" required autocomplete="current-password">
+      <button class="btn primary wide" type="submit">Sign in</button>
+    </form>
+
+    <form id="registerForm" class="hide">
+      <label>Full name</label>
+      <input name="name" required placeholder="e.g. Kasun Perera">
+      <label>Email address</label>
+      <input name="email" type="email" required placeholder="kasun@example.com">
+      <label>Password</label>
+      <input name="password" type="password" minlength="4" required placeholder="Minimum 4 characters">
+      <label>Account role</label>
+      <select name="role" id="registerRole"></select>
+      <label>Phone number</label>
+      <input name="phone" placeholder="07XXXXXXXX">
+      <div id="extraFieldWrap" class="hide">
+        <label id="extraLabel">Licence / Employee ID</label>
+        <input name="extra" id="extraInput" placeholder="Optional">
+      </div>
+      <button class="btn primary wide" type="submit">Create user account</button>
+    </form>
+
+    <div class="demo-box hide" id="demoBox">
+      <strong id="demoHeading">Default Demo Login:</strong>
+      <div class="demo-grid" id="demoGrid"></div>
+    </div>
+
+    <p class="auth-note" id="moduleNote">Connecting to BusManager server...</p>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+let toastTimer;
+let loadedModules = [];
+
+const MODULE_META = {
+  Owner:     { role: 'owner',     label: 'Bus Owner', email: 'test@gmail.com',      pass: '1234' },
+  Driver:    { role: 'driver',    label: 'Driver',    email: 'kamal@gmail.com',     pass: '12345' },
+  Conductor: { role: 'conductor', label: 'Conductor', email: 'gimhan@example.com',  pass: 'demo123' },
+  Passenger: { role: 'passenger', label: 'Passenger', email: 'passenger@gmail.com', pass: '1234' }
+};
+
+function renderAvailableModules(mods) {
+  loadedModules = mods;
+  const active = mods.filter(m => MODULE_META[m]);
+
+  if (active.length === 1) {
+    $('#authSub').textContent = active[0] + ' Portal · Sign in or add a new ' + active[0].toLowerCase() + ' user.';
+    $('#moduleNote').textContent = active[0] + ' workspace · New users are saved to shared-data/users.txt.';
+  } else if (active.length > 1) {
+    $('#authSub').textContent = 'Unified login & user registration for ' + active.join(', ') + '.';
+    $('#moduleNote').textContent = 'All ' + active.length + ' merged modules share one unified server & shared-data folder.';
+  }
+
+  const sel = $('#registerRole');
+  sel.innerHTML = active.map(m => {
+    const meta = MODULE_META[m];
+    return `<option value="${meta.role}">${meta.label}</option>`;
+  }).join('');
+  updateExtraField();
+
+  const grid = $('#demoGrid');
+  if (active.length > 0) {
+    $('#demoHeading').textContent = active.length === 1 ? 'Default Demo Account:' : 'Quick Demo Fill (Click a role):';
+    grid.style.gridTemplateColumns = active.length === 1 ? '1fr' : '1fr 1fr';
+    grid.innerHTML = active.map(m => {
+      const meta = MODULE_META[m];
+      return `<button type="button" class="demo-btn" onclick="fillDemo('${meta.email}','${meta.pass}')">${m} (${meta.email})</button>`;
+    }).join('');
+    $('#demoBox').classList.remove('hide');
+  }
+}
+
+fetch('/api/modules').then(r => r.json()).then(d => {
+  if (d && Array.isArray(d.modules)) {
+    renderAvailableModules(d.modules);
+  }
+}).catch(() => {});
+
+function notify(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 4200);
+}
+function switchAuth(which) {
+  $('#loginForm').classList.toggle('hide', which !== 'login');
+  $('#registerForm').classList.toggle('hide', which !== 'register');
+  $('#tabLogin').classList.toggle('active', which === 'login');
+  $('#tabRegister').classList.toggle('active', which === 'register');
+}
+function fillDemo(email, pass) {
+  switchAuth('login');
+  $('#loginEmail').value = email;
+  $('#loginPassword').value = pass;
+}
+function updateExtraField() {
+  const r = $('#registerRole').value;
+  const wrap = $('#extraFieldWrap');
+  if (r === 'driver') {
+    wrap.classList.remove('hide');
+    $('#extraLabel').textContent = 'Driving Licence Number';
+    $('#extraInput').placeholder = 'e.g. B123456';
+  } else if (r === 'conductor') {
+    wrap.classList.remove('hide');
+    $('#extraLabel').textContent = 'Conductor Employee ID';
+    $('#extraInput').placeholder = 'e.g. CON002';
+  } else {
+    wrap.classList.add('hide');
+  }
+}
+$('#registerRole').addEventListener('change', updateExtraField);
+
+$('#loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  try {
+    const body = new URLSearchParams(new FormData(e.target)).toString();
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      body
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message || 'Login failed');
+    const roleCap = data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1);
+    if (loadedModules.length > 0 && !loadedModules.includes(roleCap)) {
+      throw new Error('This standalone program is for ' + loadedModules.join(', ') + ' users only.');
+    }
+    sessionStorage.setItem('bm_token', data.token);
+    sessionStorage.setItem('bm_user', JSON.stringify(data.user));
+    window.location.href = data.redirect;
+  } catch (err) {
+    notify(err.message);
+  }
+});
+
+$('#registerForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  try {
+    const fd = new FormData(e.target);
+    const createdEmail = fd.get('email');
+    const createdPass = fd.get('password');
+    const body = new URLSearchParams(fd).toString();
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      body
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message || 'Registration failed');
+    notify(data.message);
+    e.target.reset();
+    updateExtraField();
+    fillDemo(createdEmail, createdPass);
+  } catch (err) {
+    notify(err.message);
+  }
+});
+</script>
+</body>
+</html>
