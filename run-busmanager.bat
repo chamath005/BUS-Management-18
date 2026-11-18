@@ -11,7 +11,7 @@ if defined JAVA_HOME (
 )
 if not exist "out" mkdir "out"
 if exist sources.txt del sources.txt
-for /r src %%f in (*.java) do echo "%%f" >> sources.txt
+powershell -NoProfile -Command "$files = @(Get-ChildItem -LiteralPath 'src' -Recurse -Filter '*.java' | ForEach-Object { [char]34 + $_.FullName.Replace('\','/') + [char]34 }); [System.IO.File]::WriteAllLines((Join-Path (Get-Location).Path 'sources.txt'), [string[]]$files, [System.Text.UTF8Encoding]::new($false))"
 "%BUS_JAVAC%" -encoding UTF-8 -d out @sources.txt
 if errorlevel 1 (
     echo Compilation failed. Make sure JDK 17 or newer is installed.
