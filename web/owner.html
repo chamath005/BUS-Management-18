@@ -1,9 +1,23 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title></title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BusManager · Owner Dashboard</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-</body>
-</html>
+<div id="application" class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo mini">BM</span><span>BusManager</span></div>
+    <div class="profile"><div class="avatar" id="avatar">O</div><div><b id="profileName">Owner</b><small id="profileRole">Bus Owner</small></div></div>
+    <nav id="nav"></nav>
+    <button class="logout" onclick="logout()">↪ &nbsp; Log out</button>
+  </aside>
+  <main class="main">
+    <header class="header"><div><div class="overline">BUS MANAGEMENT SYSTEM · OWNER</div><h2 id="heading">Dashboard</h2></div><div class="signed"><i></i><span id="signedName">Owner</span></div></header>
+    <section id="view" class="view"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="owner.js"></script>
+</body></html>
